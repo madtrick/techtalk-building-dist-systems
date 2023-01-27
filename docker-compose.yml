@@ -1,0 +1,3 @@
+services:
+  stock:
+    build: ./services/coordinator
