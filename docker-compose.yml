@@ -1,3 +1,17 @@
 services:
-  stock:
+  coordinator:
     build: ./services/coordinator
+    depends_on:
+      - graphite-statsd
+    networks:
+      - systems
+
+  graphite-statsd:
+    image: graphiteapp/graphite-statsd
+    ports:
+      - '1888:80'
+    networks:
+      - systems
+
+networks:
+  systems:
