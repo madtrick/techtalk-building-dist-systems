@@ -1,10 +1,25 @@
 services:
   coordinator:
+    container_name: coordinator
     build: ./services/coordinator
     depends_on:
       - graphite-statsd
     networks:
       - systems
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 50M
+
+  # docker-stats-statsd:
+  #   build: ./tools/docker-stats-statsd
+  #   depends_on:
+  #     - graphite-statsd
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   networks:
+  #     - systems
 
   graphite-statsd:
     image: graphiteapp/graphite-statsd
