@@ -1,19 +1,25 @@
 const Statsd = require('statsd-client')
-const crypto = require('crypto')
-// const os = require('os');
+const Koa = require('koa')
 
-console.log("Starting the coordinator...")
-
+const app = new Koa()
 const statsdClient = new Statsd({ host: 'graphite-statsd' })
 
-const values = []
+let concurrency = 0
 
-setInterval(() => {
+app.use(async (_ctx, next) => {
+  concurrency += 1
+  statsdClient.gauge('concurrency', concurrency)
+  await next()
+  concurrency -= 1
+  statsdClient.gauge('concurrency', concurrency)
+})
 
-  // Simple way to fill in the memory allocated to the container
-  values.push(crypto.randomBytes(1024 * 100))
-  console.log(values.length)
+// response
 
-  // console.log('Sending metric');
-  statsdClient.increment('some.counter')
-}, 1000)
+app.use(async ctx => {
+  console.log('Request >>>>')
+  await new Promise((resolve) => setTimeout(resolve, 1000))
+  ctx.body = 'Hello World'
+})
+
+app.listen(3000)

@@ -9,6 +9,8 @@ services:
     volumes:
       - /app/node_modules
       - ./services/coordinator/:/app:delegated
+    ports:
+      - '3000:3000'
     deploy:
       resources:
         limits:
