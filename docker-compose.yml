@@ -6,6 +6,9 @@ services:
       - graphite-statsd
     networks:
       - systems
+    volumes:
+      - /app/node_modules
+      - ./services/coordinator/:/app:delegated
     deploy:
       resources:
         limits:

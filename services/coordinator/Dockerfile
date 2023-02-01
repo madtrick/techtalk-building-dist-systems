@@ -7,4 +7,4 @@ COPY init.js /app/init.js
 
 RUN npm i
 
-CMD ["./init.js"]
+CMD ["npm", "run", "run-watch"]
