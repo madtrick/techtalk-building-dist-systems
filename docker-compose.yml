@@ -21,6 +21,7 @@ services:
     build: ./tools/docker-stats-statsd
     depends_on:
       - graphite-statsd
+      - coordinator
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
@@ -30,6 +31,15 @@ services:
     image: graphiteapp/graphite-statsd
     ports:
       - '1888:80'
+    networks:
+      - systems
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - '3001:3000'
+    depends_on:
+      - graphite-statsd
     networks:
       - systems
 
