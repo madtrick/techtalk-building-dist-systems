@@ -17,6 +17,24 @@ services:
           cpus: '0.50'
           memory: 50M
 
+  orders:
+    container_name: orders
+    build: ./services/orders
+    depends_on:
+      - graphite-statsd
+    networks:
+      - systems
+    volumes:
+      - /app/node_modules
+      - ./services/orders/:/app:delegated
+    # ports:
+    #   - '3000:3000'
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '0.50'
+    #       memory: 50M
+
   docker-stats-statsd:
     build: ./tools/docker-stats-statsd
     depends_on:
@@ -42,6 +60,8 @@ services:
       - graphite-statsd
     networks:
       - systems
+    volumes:
+      - ./volumes/grafana:/var/lib/grafana
 
 networks:
   systems:
