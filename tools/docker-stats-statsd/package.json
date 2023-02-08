@@ -2,13 +2,13 @@
   "name": "docker-stats-statsd",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "hot-shots": "^10.0.0",
     "node-docker-api": "^1.1.22",
     "statsd-client": "^0.4.7"
   }

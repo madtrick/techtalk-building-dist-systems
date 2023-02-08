@@ -3,7 +3,7 @@ services:
     container_name: coordinator
     build: ./services/coordinator
     depends_on:
-      - graphite-statsd
+      - telegraf
     networks:
       - systems
     volumes:
@@ -21,7 +21,7 @@ services:
     container_name: orders
     build: ./services/orders
     depends_on:
-      - graphite-statsd
+      - telegraf
     networks:
       - systems
     volumes:
@@ -38,17 +38,10 @@ services:
   docker-stats-statsd:
     build: ./tools/docker-stats-statsd
     depends_on:
-      - graphite-statsd
+      - telegraf
       - coordinator
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - systems
-
-  graphite-statsd:
-    image: graphiteapp/graphite-statsd
-    ports:
-      - '1888:80'
     networks:
       - systems
 
@@ -57,11 +50,32 @@ services:
     ports:
       - '3001:3000'
     depends_on:
-      - graphite-statsd
+      - influxdb
     networks:
       - systems
     volumes:
       - ./volumes/grafana:/var/lib/grafana
+
+  influxdb:
+    container_name: influx
+    image: influxdb
+    networks:
+      - systems
+    ports:
+      - 8086:8086
+
+  telegraf:
+    container_name: telegraf
+    image: telegraf
+    networks:
+      - systems
+    ports:
+      - 8125:8125/udp
+      - 8126:8126
+    depends_on:
+      - influxdb
+    volumes:
+      - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
 
 networks:
   systems:
