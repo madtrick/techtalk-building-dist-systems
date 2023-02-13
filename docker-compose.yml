@@ -10,12 +10,12 @@ services:
       - /app/node_modules
       - ./services/coordinator/:/app:delegated
     ports:
-      - '3000:3000'
-    deploy:
-      resources:
-        limits:
-          cpus: '0.50'
-          memory: 50M
+      - 3000:3000
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '0.50'
+    #       memory: 50M
 
   orders:
     container_name: orders
@@ -35,15 +35,15 @@ services:
     #       cpus: '0.50'
     #       memory: 50M
 
-  docker-stats-statsd:
-    build: ./tools/docker-stats-statsd
-    depends_on:
-      - telegraf
-      - coordinator
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - systems
+  # docker-stats-statsd:
+  #   build: ./tools/docker-stats-statsd
+  #   depends_on:
+  #     - telegraf
+  #     - coordinator
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   networks:
+  #     - systems
 
   grafana:
     image: grafana/grafana
