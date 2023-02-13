@@ -20,7 +20,7 @@ app.use(async (_ctx, next) => {
 // response
 
 app.use(async ctx => {
-  await new Promise((resolve) => setTimeout(resolve, 60_000))
+  await new Promise((resolve) => setTimeout(resolve, 50_000))
   ctx.body = 'Hello World'
 })
 
