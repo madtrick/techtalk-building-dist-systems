@@ -11,16 +11,25 @@ app.use(async (_ctx, next) => {
   statsdClient.increment('requests', 1, { service: 'orders' })
   statsdClient.gauge('concurrency', concurrency, { service: 'orders' })
 
+  const start = process.hrtime.bigint()
+
   await next()
+
+  const end = process.hrtime.bigint()
+  const latency = (end - start)/1000_000n
 
   concurrency -= 1
   statsdClient.gauge('concurrency', concurrency, { service: 'orders' })
+  statsdClient.timing('duration', latency, { service: 'orders' })
 })
 
 // response
 
 app.use(async ctx => {
-  await new Promise((resolve) => setTimeout(resolve, 50_000))
+  const baseLatency = Math.random() * 500
+  const concurrencyPenalty = concurrency * 23
+
+  await new Promise((resolve) => setTimeout(resolve, baseLatency + concurrencyPenalty))
   ctx.body = 'Hello World'
 })
 

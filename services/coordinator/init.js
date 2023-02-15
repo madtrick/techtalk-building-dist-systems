@@ -1,6 +1,6 @@
 import Statsd from 'hot-shots'
 import Koa from 'koa'
-import got from 'got'
+import got  from 'got'
 
 const app = new Koa()
 const statsdClient = new Statsd({ host: 'telegraf', port: 8125, prefix: 'techtalk.', telegraf:true, errorHandler: (e) => console.log(e), protocol: 'udp'})
@@ -40,7 +40,16 @@ app.use(async (_ctx, next) => {
 // response
 
 app.use(async ctx => {
-  await got.get('http://orders:3000')
+  try {
+    // await got.get('http://orders:3000')
+    await got.get('http://orders:3000', { timeout: { request: 500 } })
+  } catch (e) {
+    if (e.code !== 'ETIMEDOUT') {
+      console.log(e)
+    }
+
+    ctx.status = 500
+  }
 })
 
 setInterval(() => {
