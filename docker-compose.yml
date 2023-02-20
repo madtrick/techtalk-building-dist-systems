@@ -20,6 +20,21 @@ services:
   orders:
     container_name: orders
     build: ./services/orders
+    environment:
+      SERVICE_NAME: orders
+    depends_on:
+      - telegraf
+    networks:
+      - systems
+    volumes:
+      - /app/node_modules
+      - ./services/orders/:/app:delegated
+
+  orders-2:
+    container_name: orders-2
+    build: ./services/orders
+    environment:
+      SERVICE_NAME: orders-2
     depends_on:
       - telegraf
     networks:

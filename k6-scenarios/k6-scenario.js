@@ -9,14 +9,14 @@ export const options = {
       iterations: 50,
       maxDuration: '30s'
     },
-    second_wave: {
-      startTime: '10s',
-      executor: 'constant-arrival-rate',
-      preAllocatedVUs: 200,
-      rate: 25,
-      timeUnit: '1s',
-      duration: '20s'
-    }
+    // second_wave: {
+    //   startTime: '10s',
+    //   executor: 'constant-arrival-rate',
+    //   preAllocatedVUs: 200,
+    //   rate: 25,
+    //   timeUnit: '1s',
+    //   duration: '20s'
+    // }
   },
 }
 
