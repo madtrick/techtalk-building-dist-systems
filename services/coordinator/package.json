@@ -4,13 +4,14 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "run-watch": "nodemon -- init.js"
+    "run-watch": "nodemon init.js --ignore *.json"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "got": "^12.5.3",
     "hot-shots": "^9.3.0",
+    "json-diff": "^1.0.3",
     "koa": "^2.14.1",
     "nodemon": "^2.0.20",
     "statsd-client": "^0.4.7"

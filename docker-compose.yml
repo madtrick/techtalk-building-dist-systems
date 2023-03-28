@@ -2,46 +2,51 @@ services:
   coordinator:
     container_name: coordinator
     build: ./services/coordinator
+    environment:
+      CONFIG_FILE_PATH: config.json
     depends_on:
       - telegraf
     networks:
       - systems
     volumes:
       - /app/node_modules
+      - ./config.json:/app/config.json:delegated,ro
       - ./services/coordinator/:/app:delegated
     ports:
       - 3000:3000
-    # deploy:
-    #   resources:
-    #     limits:
-    #       cpus: '0.50'
-    #       memory: 50M
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 500M
 
   orders:
     container_name: orders
     build: ./services/orders
     environment:
       SERVICE_NAME: orders
+      CONFIG_FILE_PATH: config.json
     depends_on:
       - telegraf
     networks:
       - systems
     volumes:
       - /app/node_modules
+      - ./config.json:/app/config.json:delegated
       - ./services/orders/:/app:delegated
 
-  orders-2:
-    container_name: orders-2
-    build: ./services/orders
-    environment:
-      SERVICE_NAME: orders-2
-    depends_on:
-      - telegraf
-    networks:
-      - systems
-    volumes:
-      - /app/node_modules
-      - ./services/orders/:/app:delegated
+  # orders-2:
+  #   container_name: orders-2
+  #   build: ./services/orders
+  #   environment:
+  #     SERVICE_NAME: orders-2
+  #   depends_on:
+  #     - telegraf
+  #   networks:
+  #     - systems
+  #   volumes:
+  #     - /app/node_modules
+  #     - ./services/orders/:/app:delegated
     # ports:
     #   - '3000:3000'
     # deploy:
