@@ -3,14 +3,12 @@
     "percentageOfSlowedDownRequests": 0,
     "slowedDownRequestLatency": 15000,
     "baseLatency": 50,
-    "useNewFeature": true,
-    "backpressureAt": -1
+    "useNewFeature": true
   },
   "coordinator": {
     "timeout": 200,
     "retries": {
-      "limit": 1
-    },
-    "requestDeadline": 150
+      "limit": 3
+    }
   }
 }
