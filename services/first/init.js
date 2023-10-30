@@ -16,17 +16,11 @@ const statsdClient = new Statsd({
 
 let concurrency = 0;
 let requests = 0;
-const SERVICE_NAME = "coordinator";
+
+const SERVICE_NAME = process.env.SERVICE_NAME;
 async function readConfig() {
   const data = await fs.promises.readFile(process.env.CONFIG_FILE_PATH);
   return JSON.parse(data.toString());
-}
-
-function loadBalance() {
-  const hosts = ["http://orders:3000", "http://orders-2:3000?overload=true"];
-  const index = Math.trunc(Math.random() * 2);
-
-  return hosts[index === 2 ? 1 : index];
 }
 
 class ClientLease {
@@ -87,28 +81,6 @@ class ClientLease {
 }
 
 const CLIENT_LEASE = new ClientLease(500);
-// const GIBBERISH = Array(1024*100).fill('A')
-
-// function allocateArray(size) {
-//   /**
-//    * This function exists because I needed a way to create data in the heap.
-//    * Using `crypto.randomBytes` allocates them in the `externalMemory`.
-//    */
-//   const array = new Array(size)
-//   array.forEach((e, index) => array[index] = 'A')
-
-//   return array
-// }
-
-// app.use(async (ctx, next) => {
-//   ctx.state = {
-//     // gibberish: allocateArray(1024 * 100)
-//     // gibberish: 'a'
-//     // gibberish: GIBBERISH.slice(0)
-//   }
-
-//   await next()
-// })
 
 async function trackTiming(fn, callback) {
   const start = process.hrtime.bigint();
@@ -126,8 +98,8 @@ async function trackTiming(fn, callback) {
 app.use(async (ctx, next) => {
   concurrency += 1;
   requests += 1;
-  statsdClient.increment("requests", 1, { service: "coordinator" });
-  statsdClient.gauge("concurrency", concurrency, { service: "coordinator" });
+  statsdClient.increment("requests", 1, { service: SERVICE_NAME });
+  statsdClient.gauge("concurrency", concurrency, { service: SERVICE_NAME });
 
   const start = process.hrtime.bigint();
 
@@ -138,28 +110,13 @@ app.use(async (ctx, next) => {
 
   concurrency -= 1;
 
-  statsdClient.gauge("concurrency", concurrency, { service: "coordinator" });
+  statsdClient.gauge("concurrency", concurrency, { service: SERVICE_NAME });
   statsdClient.timing("duration", latency, { service: SERVICE_NAME });
-
-  if (latency <= 200) {
-    statsdClient.increment("duration_lte_200", { service: SERVICE_NAME });
-    // } else if (latency > 200 && latency < 500) {
-    //   statsdClient.increment('duration_200_500', { service: SERVICE_NAME })
-    // } else if (latency > 500 && latency < 1000) {
-    //   statsdClient.increment('duration_500_1000', { service: SERVICE_NAME })
-    // } else if (latency > 1000 && latency < 2000) {
-    //   statsdClient.increment('duration_1000_2000', { service: SERVICE_NAME })
-  } else {
-    statsdClient.increment("duration_gt_200", { service: SERVICE_NAME });
-  }
-
   statsdClient.increment("status_code", {
-    service: "coordinator",
+    service: SERVICE_NAME,
     status: ctx.status,
   });
 });
-
-// response
 
 app.use(async (ctx) => {
   let lease;
@@ -218,10 +175,10 @@ app.use(async (ctx) => {
 
     const response = await trackTiming(
       async () => {
-        return got.get("http://orders:3000", gotOptions);
+        return got.get("http://second:3000", gotOptions);
       },
       (latency) => {
-        statsdClient.timing("latency-orders", latency, {
+        statsdClient.timing("latency-second", latency, {
           service: SERVICE_NAME,
         });
       }
@@ -230,7 +187,7 @@ app.use(async (ctx) => {
     ctx.status = response.statusCode;
   } catch (e) {
     if (e && e.code === "ETIMEDOUT") {
-      statsdClient.increment("timeouts", { service: "coordinator" });
+      statsdClient.increment("timeouts", { service: SERVICE_NAME });
     } else {
       console.log("ERROR", e);
     }
@@ -249,10 +206,10 @@ process.on("unhandledRejection", (reason, p) => {
 
 setInterval(() => {
   const { heapUsed, heapTotal } = process.memoryUsage();
-  statsdClient.gauge("heap-used", heapUsed, { service: "coordinator" });
-  statsdClient.gauge("heap-total", heapTotal, { service: "coordinator" });
+  statsdClient.gauge("heap-used", heapUsed, { service: SERVICE_NAME });
+  statsdClient.gauge("heap-total", heapTotal, { service: SERVICE_NAME });
   statsdClient.gauge("leased-clients", CLIENT_LEASE.checkedout, {
-    service: "coordinator",
+    service: SERVICE_NAME,
   });
 
   requests = 0;
@@ -265,7 +222,7 @@ fs.watchFile(process.env.CONFIG_FILE_PATH, async () => {
   console.log(
     `[${new Date().toISOString()}] ${process.env.CONFIG_FILE_PATH} file saved`
   );
-  const { coordinator: newConfig } = await readConfig();
+  const { [SERVICE_NAME]: newConfig } = await readConfig();
   const diffValue = diff.diffString(app.context.settings.config, newConfig);
 
   if (diffValue.length === 0) {
@@ -280,7 +237,7 @@ fs.watchFile(process.env.CONFIG_FILE_PATH, async () => {
 });
 
 async function main() {
-  const { coordinator: config } = await readConfig();
+  const { [SERVICE_NAME]: config } = await readConfig();
 
   app.context.settings = { config };
   app.listen(3000);

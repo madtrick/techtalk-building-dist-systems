@@ -15,7 +15,7 @@ Setup
 
 - Set the influxdb token in the influxdb datasource
 - Set the `organization` name in the influxdb datasource
-- Set the `bucket` name in the influxdb datasource
+- Set the `bucket` name in the `telegraf.conf` file
 
 # Influxdb
 
@@ -31,3 +31,11 @@ Setup:
 - Set the influxdb token in the `telegraf.conf` file
 - Set the `organization` name in the `telegraf.conf` file
 - Set the `bucket` name in the `telegraf.conf` file
+
+# K6
+
+- Increase the number of vus
+
+```shell
+docker exec $(docker ps -aqf="name=k6") k6 scale -u <number>
+```

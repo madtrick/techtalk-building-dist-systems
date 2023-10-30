@@ -1,30 +1,31 @@
 services:
-  coordinator:
-    container_name: coordinator
-    build: ./services/coordinator
+  first:
+    container_name: first
+    build: ./services/first
     environment:
       CONFIG_FILE_PATH: config.json
+      SERVICE_NAME: first
     depends_on:
       - telegraf
     networks:
       - systems
     volumes:
       - /app/node_modules
-      - ./config.json:/app/config.json:delegated,ro
-      - ./services/coordinator/:/app:delegated
+      - ./config.json:/app/config.json
+      - ./services/first/:/app:delegated
     ports:
       - 3000:3000
     deploy:
       resources:
         limits:
-          cpus: '0.50'
+          cpus: "0.50"
           memory: 500M
 
-  orders:
-    container_name: orders
-    build: ./services/orders
+  second:
+    container_name: second
+    build: ./services/second
     environment:
-      SERVICE_NAME: orders
+      SERVICE_NAME: second
       CONFIG_FILE_PATH: config.json
     depends_on:
       - telegraf
@@ -32,43 +33,13 @@ services:
       - systems
     volumes:
       - /app/node_modules
-      - ./config.json:/app/config.json:delegated
-      - ./services/orders/:/app:delegated
-
-  # orders-2:
-  #   container_name: orders-2
-  #   build: ./services/orders
-  #   environment:
-  #     SERVICE_NAME: orders-2
-  #   depends_on:
-  #     - telegraf
-  #   networks:
-  #     - systems
-  #   volumes:
-  #     - /app/node_modules
-  #     - ./services/orders/:/app:delegated
-    # ports:
-    #   - '3000:3000'
-    # deploy:
-    #   resources:
-    #     limits:
-    #       cpus: '0.50'
-    #       memory: 50M
-
-  # docker-stats-statsd:
-  #   build: ./tools/docker-stats-statsd
-  #   depends_on:
-  #     - telegraf
-  #     - coordinator
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #   networks:
-  #     - systems
+      - ./config.json:/app/config.json:cached
+      - ./services/second/:/app:delegated
 
   grafana:
     image: grafana/grafana
     ports:
-      - '3001:3000'
+      - "3001:3000"
     depends_on:
       - influxdb
     networks:

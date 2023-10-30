@@ -49,7 +49,7 @@ fs.watchFile(process.env.CONFIG_FILE_PATH, async () => {
   console.log(
     `[${new Date().toISOString()}] ${process.env.CONFIG_FILE_PATH} file saved`
   );
-  const { orders: newConfig } = await readConfig();
+  const { [SERVICE_NAME]: newConfig } = await readConfig();
   const diffValue = diff.diffString(app.context.settings.config, newConfig);
 
   if (diffValue.length === 0) {
@@ -118,7 +118,7 @@ app.use(async (ctx) => {
 });
 
 async function main() {
-  const { orders: config } = await readConfig();
+  const { [SERVICE_NAME]: config } = await readConfig();
 
   app.context.settings = { config };
   app.listen(3000);

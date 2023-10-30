@@ -1,14 +1,14 @@
-import http from 'k6/http'
-import { sleep } from 'k6'
+import http from "k6/http";
+import { sleep } from "k6";
 
 export const options = {
   scenarios: {
     trickle: {
-      executor: 'externally-controlled',
-      duration: '7200s',
+      executor: "externally-controlled",
+      duration: "7200s",
       vus: 5,
-      maxVUs: 1000
-    }
+      maxVUs: 1000,
+    },
     // first_wave: {
     //   executor: 'per-vu-iterations',
     //   vus: 100,
@@ -24,8 +24,8 @@ export const options = {
     //   duration: '20s'
     // }
   },
-}
+};
 
 export default function () {
-  http.get('http://coordinator:3000', { timeout: '5m' })
+  http.get("http://first:3000", { timeout: "5m" });
 }

@@ -1,14 +1,14 @@
 {
-  "orders": {
-    "percentageOfSlowedDownRequests": 0,
+  "second": {
+    "percentageOfSlowedDownRequests": 1,
     "slowedDownRequestLatency": 15000,
     "baseLatency": 50,
-    "useNewFeature": true
+    "useNewFeature": false
   },
-  "coordinator": {
-    "timeout": 200,
+  "first": {
+    "timeout": -1,
     "retries": {
-      "limit": 3
+      "limit": 1
     }
   }
 }
